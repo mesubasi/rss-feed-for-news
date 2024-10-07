@@ -1,8 +1,7 @@
-import { pgTable, serial, text, varchar } from "drizzle-orm/pg-core";
 import { drizzle } from "drizzle-orm/node-postgres";
-import { Client, Pool } from "pg";
+import { Pool } from "pg";
+import { users }from "./schema"
 import { OnModuleInit } from "@nestjs/common";
-
 export class Index implements OnModuleInit{
     private pool: Pool;
     db: any;
@@ -17,7 +16,9 @@ export class Index implements OnModuleInit{
 
     async onModuleInit() {
        try {
-        const result: any = await this.db.select().from();
+        const result: any = await this.db.select().from(users);
+        console.log("DB'ye bağlantı");
+        
        } catch (error) {
         console.log(error);
         throw new Error("Modül Başlatılamadı!");
