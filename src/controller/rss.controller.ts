@@ -1,7 +1,7 @@
 import { Controller, Get } from '@nestjs/common';
 
 @Controller('feed')
-export class ControllerController {
+export class RSSController {
     @Get()
     async rssFeed(){
         try {

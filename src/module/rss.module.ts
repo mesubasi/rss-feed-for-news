@@ -1,8 +1,11 @@
 import { Module } from '@nestjs/common';
+import Parser from 'rss-parser';
+import { RSSController } from 'src/controller/rss.controller';
+
 
 @Module({
-    imports: [],
-    controllers: [],
+    imports: [Parser],
+    controllers: [RSSController],
     providers: []
 })
 
