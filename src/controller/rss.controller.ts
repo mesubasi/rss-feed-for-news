@@ -1,6 +1,25 @@
-import { Controller, Get, Res } from '@nestjs/common';
-import { Response } from 'express';
+import { Body, Controller, Get, OnModuleInit, Post, Res } from '@nestjs/common';
+import { response, Response } from 'express';
 import * as Parser from 'rss-parser';
+
+@Controller('feedtodb')
+export class FeedToDatabase implements OnModuleInit{
+
+    async onModuleInit() {
+        throw new Error('Method not implemented.');
+    }
+
+    @Post()
+    async feedtoDB(@Body() body: {name: string, url: string}){
+        try {
+            
+            response.status(201).json("Veritabanına Başarıyla Kaydedildi!")
+        } catch (err) {
+          console.log(err);
+          throw new Error("DB'ye veri gönderilirken hata oluştu")
+        }
+    }
+}
 
 @Controller('feed')
 export class RSSController {
@@ -11,9 +30,8 @@ export class RSSController {
         try {
             const feed = await this.parser.parseURL("https://www.cnnturk.com/feed/rss/all/news")
             return res.json(feed)
-            
-        } catch (error) {
-            console.log(error);
+        } catch (err) {
+            console.log(err);
             throw new Error("RSS de bir problem oluştu");
         }
     }
