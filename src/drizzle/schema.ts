@@ -9,3 +9,9 @@ export const rss = pgTable('rss', {
   createdAt: timestamp("created_at").notNull().defaultNow(),
   updatedAt: timestamp("updated_at").notNull().defaultNow() 
 });
+
+export const bodyUrl = pgTable("bodyurl", {
+  id: serial("id").primaryKey(),
+  name: text("name"),
+  url: text("url").notNull()
+})
