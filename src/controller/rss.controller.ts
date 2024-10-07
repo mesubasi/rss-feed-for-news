@@ -3,16 +3,11 @@ import { response, Response } from 'express';
 import * as Parser from 'rss-parser';
 
 @Controller('feedtodb')
-export class FeedToDatabase implements OnModuleInit{
-
-    async onModuleInit() {
-        throw new Error('Method not implemented.');
-    }
+export class FeedToDatabase{
 
     @Post()
-    async feedtoDB(@Body() body: {name: string, url: string}){
+    async feedtoDB(@Body() body: {name: string, url: string}, @Res() res: Response){
         try {
-            
             response.status(201).json("Veritabanına Başarıyla Kaydedildi!")
         } catch (err) {
           console.log(err);

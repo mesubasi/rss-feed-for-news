@@ -12,6 +12,6 @@ export const rss = pgTable('rss', {
 
 export const bodyUrl = pgTable("bodyurl", {
   id: serial("id").primaryKey(),
-  name: text("name"),
+  name: text("name").notNull(),
   url: text("url").notNull()
 })
