@@ -1,4 +1,14 @@
-import { Controller } from '@nestjs/common';
+import { Controller, Get } from '@nestjs/common';
 
-@Controller('controller')
-export class ControllerController {}
+@Controller('feed')
+export class ControllerController {
+    @Get()
+    async rssFeed(){
+        try {
+            
+        } catch (error) {
+            console.log(error);
+            throw new Error("RSS de bir problem oluştu");
+        }
+    }
+}
