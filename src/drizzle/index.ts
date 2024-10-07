@@ -1,6 +1,6 @@
 import { drizzle } from "drizzle-orm/node-postgres";
 import { Pool } from "pg";
-import { users }from "./schema"
+import { rss }from "./schema"
 import { OnModuleInit } from "@nestjs/common";
 export class Index implements OnModuleInit{
     private pool: Pool;
@@ -16,7 +16,7 @@ export class Index implements OnModuleInit{
 
     async onModuleInit() {
        try {
-        const result: any = await this.db.select().from(users);
+        // const result: any = await this.db.select().from(rss);
         console.log("DB'ye bağlantı");
         
        } catch (error) {
