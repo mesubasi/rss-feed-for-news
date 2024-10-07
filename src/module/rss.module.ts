@@ -1,5 +1,5 @@
 import { Module } from '@nestjs/common';
-import { RSSController } from 'src/controller/rss.controller';
+import { RSSController } from 'src/controllers/rss.controller';
 
 
 @Module({
@@ -8,6 +8,4 @@ import { RSSController } from 'src/controller/rss.controller';
     providers: []
 })
 
-export class RSS {
-    
-}
+export class RSS {}

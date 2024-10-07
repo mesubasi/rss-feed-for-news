@@ -1,4 +1,4 @@
-import { Body, Controller, Get, OnModuleInit, Post, Res } from '@nestjs/common';
+import { Body, Controller, Get, Post, Res } from '@nestjs/common';
 import { response, Response } from 'express';
 import * as Parser from 'rss-parser';
 
@@ -8,7 +8,7 @@ export class FeedToDatabase{
     @Post()
     async feedtoDB(@Body() body: {name: string, url: string}, @Res() res: Response){
         try {
-            response.status(201).json("Veritabanına Başarıyla Kaydedildi!")
+            response.status(201).json({message: "Veritabanına Başarıyla Kaydedildi!"})
         } catch (err) {
           console.log(err);
           throw new Error("DB'ye veri gönderilirken hata oluştu")
@@ -19,7 +19,6 @@ export class FeedToDatabase{
 @Controller('feed')
 export class RSSController {
     parser: Parser = new Parser()
-
     @Get()
     async rssFeed(@Res() res : Response){
         try {

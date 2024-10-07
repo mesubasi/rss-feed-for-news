@@ -1,6 +1,6 @@
 import { drizzle } from "drizzle-orm/node-postgres";
 import { Pool } from "pg";
-import { rss }from "./schema"
+import { rss, bodyUrl }from "./schema"
 import { OnModuleInit } from "@nestjs/common";
 export class Index implements OnModuleInit{
     private pool: Pool;
@@ -23,5 +23,16 @@ export class Index implements OnModuleInit{
         console.log(error);
         throw new Error("Modül Başlatılamadı!");
        } 
+    }
+
+    async addRss(name: string, url: string){
+        try {
+            await this.db.insert(rss).values({
+                name,
+                url,
+            })
+        } catch (err) {
+            console.log(err);
+        }
     }
 }
