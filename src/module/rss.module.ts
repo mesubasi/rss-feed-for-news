@@ -1,11 +1,12 @@
 import { Module } from '@nestjs/common';
-import { RSSController } from 'src/controllers/rss.controller';
+import { FeedToDatabase, RSSController } from 'src/controllers/rss.controller';
+import { RssService } from 'src/service/rss.service';
 
 
 @Module({
     imports: [],
-    controllers: [RSSController],
-    providers: []
+    controllers: [RSSController, FeedToDatabase],
+    providers: [RssService]
 })
 
 export class RSS {}

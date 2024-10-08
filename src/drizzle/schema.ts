@@ -1,17 +1,23 @@
-import { pgTable, serial, text, varchar, timestamp } from "drizzle-orm/pg-core";
+import { pgTable, serial, varchar, timestamp } from 'drizzle-orm/pg-core';
+import { sql } from 'drizzle-orm';
 
-export const rss = pgTable('rss', {
-  id: serial('id').primaryKey(),
-  contentOwner: text("contentOwner"),
-  title: text('title'),
-  description: varchar('description', { length: 256 }),
-  url: text("url"),
-  createdAt: timestamp("created_at").notNull().defaultNow(),
-  updatedAt: timestamp("updated_at").notNull().defaultNow() 
+export const message = pgTable('message', {
+  id: serial('id').primaryKey().notNull(),
+  username: varchar('username').notNull(),
+  content: varchar('content').notNull(),
+  usercontent: varchar('usercontent').notNull(),
+  timestamp: timestamp('timestamp', {
+    withTimezone: true,
+    mode: 'string',
+  }).notNull(),
 });
 
-export const bodyUrl = pgTable("bodyurl", {
-  id: serial("id").primaryKey(),
-  name: text("name").notNull(),
-  url: text("url").notNull()
-})
+export const bodyurl = pgTable('bodyurl', {
+  id: serial('id').notNull().primaryKey(),
+  name: varchar('name').notNull(),
+  url: varchar('url').notNull().unique(),
+  timestamp: timestamp('timestamp', {
+    withTimezone: true,
+    mode: 'string',
+  }).notNull(),
+});

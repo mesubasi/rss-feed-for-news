@@ -5,7 +5,7 @@ import { RssService } from './service/rss.service';
 import * as dotenv from "dotenv"
 dotenv.config()
 @Module({
-  imports: [Index, RSS],
+  imports: [RSS],
   controllers: [],
   providers: [RssService],
 })
