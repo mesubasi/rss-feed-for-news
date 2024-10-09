@@ -7,7 +7,7 @@ import {
   Query,
   Res,
 } from '@nestjs/common';
-import { response, Response } from 'express';
+import { Response } from 'express';
 import * as Parser from 'rss-parser';
 import { RssService } from 'src/service/rss.service';
 @Injectable()
@@ -38,29 +38,34 @@ export class RSSController {
     try {
       const url = await this.rssService.searchRSS(dynamicname);
       const feed = await this.parser.parseURL(url[0].url);
-      const JSONFeed = await feed;
-      console.log(JSONFeed);
       
-      if (JSONFeed) {
+      if (feed) {
         try {
-          const mappingFeedJSON = JSONFeed.items.map(
+          const mappingFeedJSON = feed.items.map(
             (item: {
               title: string;
               link: string;
               pubDate: string;
               content: string;
-              isoDate: any
+              guid: string;
+              isoDate: any;
             }) => {
               return {
                 title: item.title,
                 link: item.link,
                 pubDate: item.pubDate,
                 content: item.content,
+                guid: item.guid,
                 isoDate: item.isoDate,
               };
             },
           );
-          return res.json(mappingFeedJSON);
+          const JsonToDB = res.json(mappingFeedJSON);
+          for (const json of mappingFeedJSON) {
+            await this.rssService.addJSON(json.title, json.link, new Date(json.pubDate), json.content, json.guid, new Date(json.isoDate));
+          }
+  
+          return res.json({ message: 'Veritabanına Başarıyla Kaydedildi!' });
         } catch (error) {
           console.log(error);
         }

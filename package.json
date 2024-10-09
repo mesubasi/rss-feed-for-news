@@ -26,7 +26,6 @@
     "axios": "^1.7.7",
     "dotenv": "^16.4.5",
     "drizzle-orm": "^0.33.0",
-    "logger": "^0.0.1",
     "pg": "^8.13.0",
     "reflect-metadata": "^0.2.0",
     "rss-parser": "^3.13.0",

@@ -21,3 +21,15 @@ export const bodyurl = pgTable('bodyurl', {
     mode: 'string',
   }).notNull(),
 });
+
+
+export const feedtable = pgTable('feedtable', {
+  id: serial('id').notNull().primaryKey().unique(),
+  title: varchar('title'),
+  url: varchar('url').unique(),
+  content: varchar("content"),
+  timestamp: timestamp('timestamp', {
+    withTimezone: true,
+    mode: 'string',
+  }).notNull(),
+});
