@@ -1,4 +1,4 @@
-import { pgTable, serial, varchar, timestamp } from 'drizzle-orm/pg-core';
+import { pgTable, serial, varchar, timestamp, text, date } from 'drizzle-orm/pg-core';
 import { sql } from 'drizzle-orm';
 
 export const message = pgTable('message', {
@@ -24,12 +24,15 @@ export const bodyurl = pgTable('bodyurl', {
 
 
 export const feedtable = pgTable('feedtable', {
-  id: serial('id').notNull().primaryKey().unique(),
+  id: serial('id').notNull().primaryKey(),
   title: varchar('title'),
-  url: varchar('url').unique(),
-  content: varchar("content"),
-  timestamp: timestamp('timestamp', {
+  link: varchar('link'),
+  pubDate: varchar('pubdate'),
+  content: varchar('content'),
+  guid: varchar('guid'),
+  isoDate: varchar('isodate'),
+  createdAt: timestamp('created_at', {
     withTimezone: true,
-    mode: 'string',
-  }).notNull(),
+    mode: "string"
+  }).defaultNow().notNull(),
 });

@@ -20,7 +20,6 @@ export class FeedToDatabase {
       await this.rssService.addRSS(body.name, body.url);
       return { message: 'Veritabanına Başarıyla Kaydedildi!' };
     } catch (err) {
-      console.log(err);
       throw new Error("DB'ye veri gönderilirken hata oluştu");
     }
   }
@@ -38,40 +37,23 @@ export class RSSController {
     try {
       const url = await this.rssService.searchRSS(dynamicname);
       const feed = await this.parser.parseURL(url[0].url);
-      
-      if (feed) {
-        try {
-          const mappingFeedJSON = feed.items.map(
-            (item: {
-              title: string;
-              link: string;
-              pubDate: string;
-              content: string;
-              guid: string;
-              isoDate: any;
-            }) => {
-              return {
-                title: item.title,
-                link: item.link,
-                pubDate: item.pubDate,
-                content: item.content,
-                guid: item.guid,
-                isoDate: item.isoDate,
-              };
-            },
+
+      await Promise.all(
+        feed.items.map(async (item) => {
+          await this.rssService.addJSON(
+            item.title,
+            item.link,
+            item.pubDate,
+            item.guid,
+            item.isoDate,
+            item.content,
+            item.url,
+            new Date 
           );
-          const JsonToDB = res.json(mappingFeedJSON);
-          for (const json of mappingFeedJSON) {
-            await this.rssService.addJSON(json.title, json.link, new Date(json.pubDate), json.content, json.guid, new Date(json.isoDate));
-          }
-  
-          return res.json({ message: 'Veritabanına Başarıyla Kaydedildi!' });
-        } catch (error) {
-          console.log(error);
-        }
-      }
+        })
+      );
+      return res.status(200).json({message: "Başarıyla DB'ye kaydedildi!"})
     } catch (err) {
-      console.log(err);
       throw new Error('RSS de bir problem oluştu');
     }
   }
