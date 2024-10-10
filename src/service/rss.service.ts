@@ -3,7 +3,6 @@ import { bodyurl, feedtable } from '../drizzle/schema';
 import { Pool } from 'pg';
 import { drizzle } from 'drizzle-orm/node-postgres';
 import { sql } from 'drizzle-orm';
-import * as bcrypt from "bcrypt"
 
 @Injectable()
 export class RssService {
