@@ -3,6 +3,7 @@ import { bodyurl, feedtable } from '../drizzle/schema';
 import { Pool } from 'pg';
 import { drizzle } from 'drizzle-orm/node-postgres';
 import { sql } from 'drizzle-orm';
+import * as bcrypt from "bcrypt"
 
 @Injectable()
 export class RssService {
@@ -62,6 +63,13 @@ export class RssService {
     created_at: Date = new Date(),
   ) {
     try {
+
+      const existingItem = await this.db.select().from(feedtable).where(sql`${feedtable.title} = ${title} AND ${feedtable.pubDate} = ${pubDate}`)
+
+      if (existingItem.length > 0) {        
+        return
+      }
+
       await this.db
         .insert(feedtable)
         .values({
@@ -75,6 +83,8 @@ export class RssService {
           createdAt: created_at,
         })
         .execute();
+        
+    
     } catch (error) {
       console.error('Error adding JSON:', error);
       throw new HttpException(

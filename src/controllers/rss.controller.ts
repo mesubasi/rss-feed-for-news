@@ -11,6 +11,7 @@ import { Response } from 'express';
 import * as Parser from 'rss-parser';
 import { AppService } from 'src/app.service';
 import { RssService } from 'src/service/rss.service';
+import * as crypto from "crypto"
 @Injectable()
 @Controller('feedtodb')
 export class FeedToDatabase {

@@ -1,5 +1,4 @@
 import { pgTable, serial, varchar, timestamp, text, date } from 'drizzle-orm/pg-core';
-import { sql } from 'drizzle-orm';
 
 export const message = pgTable('message', {
   id: serial('id').primaryKey().notNull(),
