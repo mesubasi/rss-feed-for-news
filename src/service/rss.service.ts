@@ -22,7 +22,7 @@ export class RssService {
         .values({
           name,
           url,
-          timestamp: new Date().toISOString(),
+          timestamp: new Date(),
         })
         .execute();
     } catch (err) {
@@ -36,10 +36,11 @@ export class RssService {
 
   async searchRSS(name: string) {
     try {
+      const trim = name.trim().replace(/\s+/g, '')
       const result = await this.db
         .select()
         .from(bodyurl)
-        .where(sql`TRIM(${bodyurl.name}) ILIKE ${name.trim()}`);
+        .where(sql`REPLACE(TRIM(${bodyurl.name}), ' ', '') ILIKE ${trim}`);
       return result;
     } catch (error) {
       console.error('Error searching RSS:', error);
@@ -51,7 +52,14 @@ export class RssService {
   }
 
   async addJSON(
-title: string, link: string, pubDate: string, content: string, guid: string, isoDate: string, url: string, created_at: Date,
+    title: string,
+    link: string,
+    pubDate: string,
+    content: string,
+    guid: string,
+    isoDate: string,
+    url: string,
+    created_at: Date = new Date(),
   ) {
     try {
       await this.db
@@ -64,7 +72,7 @@ title: string, link: string, pubDate: string, content: string, guid: string, iso
           content,
           guid,
           isoDate,
-          created_at
+          createdAt: created_at,
         })
         .execute();
     } catch (error) {
