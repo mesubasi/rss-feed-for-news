@@ -41,7 +41,13 @@ export class RSSController {
     private readonly rssService: RssService,
     private readonly appService: AppService,
   ) {}
-  parser: Parser = new Parser();
+  parser: Parser = new Parser({
+    customFields: {
+      item: [
+        ['media:content', 'media:content', {keepArray: true}],
+      ]
+    }
+  });
   @Get()
   async rssFeed(@Query('name') name: string, @Res() res: Response) {
     try {
