@@ -28,7 +28,7 @@ export class RssService {
     } catch (err) {
       console.error('Error adding RSS:', err);
       throw new HttpException(
-        'Failed to add RSS feed',
+        'INTERNAL SERVER ERROR',
         HttpStatus.INTERNAL_SERVER_ERROR,
       );
     }
@@ -36,16 +36,15 @@ export class RssService {
 
   async searchRSS(name: string) {
     try {
-      const trim = name.trim();
       const result = await this.db
         .select()
         .from(bodyurl)
-        .where(sql`TRIM(${bodyurl.name}) ILIKE ${trim}`);
+        .where(sql`TRIM(${bodyurl.name}) ILIKE ${name.trim()}`);
       return result;
     } catch (error) {
       console.error('Error searching RSS:', error);
       throw new HttpException(
-        'Failed to search RSS feeds',
+        'INTERNAL SERVER ERROR',
         HttpStatus.INTERNAL_SERVER_ERROR,
       );
     }
