@@ -9,11 +9,15 @@ import {
 } from '@nestjs/common';
 import { Response } from 'express';
 import * as Parser from 'rss-parser';
+import { AppService } from 'src/app.service';
 import { RssService } from 'src/service/rss.service';
 @Injectable()
 @Controller('feedtodb')
 export class FeedToDatabase {
-  constructor(private readonly rssService: RssService) {}
+  constructor(
+    private readonly rssService: RssService,
+    private readonly appService: AppService,
+  ) {}
   @Post()
   async feedtoDB(
     @Body() body: { name: string; url: string },
@@ -32,7 +36,10 @@ export class FeedToDatabase {
 
 @Controller('feed')
 export class RSSController {
-  constructor(private readonly rssService: RssService) {}
+  constructor(
+    private readonly rssService: RssService,
+    private readonly appService: AppService,
+  ) {}
   parser: Parser = new Parser();
   @Get()
   async rssFeed(@Query('name') name: string, @Res() res: Response) {
@@ -42,7 +49,6 @@ export class RSSController {
 
       const feedToDB = await Promise.all(
         feed.items.map(async (item) => {
-          
           await this.rssService.addJSON(
             item.title,
             item.link,
