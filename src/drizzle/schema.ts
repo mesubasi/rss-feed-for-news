@@ -26,11 +26,12 @@ export const feedtable = pgTable('feedtable', {
   id: serial('id').notNull().primaryKey(),
   title: varchar('title'),
   link: varchar('link'),
-  pubDate: varchar('pubdate'),
+  pubDate: timestamp('pubdate'),
   content: varchar('content'),
   guid: varchar('guid'),
   isoDate: varchar('isodate'),
   media: varchar("media"),
+  parsedDomain: varchar('parsed_domain'),
   createdAt: timestamp('created_at', {
     withTimezone: true,
     mode: "string"

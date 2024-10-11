@@ -17,15 +17,16 @@ import { CACHE_MANAGER } from '@nestjs/cache-manager';
 import { Cache } from 'cache-manager';
 import { Cron, CronExpression } from '@nestjs/schedule';
 
-interface RSSItem {
+export interface RSSItem {
   title: string;
   link: string;
-  pubDate: string;
+  pubDate: Date;
   content: string;
   guid: string;
   isoDate: string;
   url: string;
   media: string;
+  parsedDomain: string;
 }
 
 @Injectable()
@@ -42,6 +43,23 @@ export class RSSController {
     },
   });
 
+  private parseDomain(url: string): string {
+    try {
+      const parsedUrl = new URL(url);
+      const hostParts = parsedUrl.hostname.split('.');
+
+      if (hostParts.length >= 2) {
+        const domainIndex = hostParts[0] === 'www' ? 1 : 0;
+        const result = hostParts[domainIndex];
+        return result;
+      }
+      return hostParts[0];
+    } catch (error) {
+      console.error('Error parsing URL:', error);
+      return '';
+    }
+  }
+
   @Get()
   async rssFeed(@Query('name') name: string, @Res() res: Response) {
     const cacheKey = `feed:${name}`;
@@ -49,7 +67,30 @@ export class RSSController {
       let cachedResult = await this.cacheManager.get<RSSItem[]>(cacheKey);
 
       if (!cachedResult) {
-        cachedResult = await this.fetchAndCacheRSSFeed(name);
+        const oneDayAgo = new Date(Date.now() - 24 * 60 * 60 * 1000);
+
+        const allItems = await this.rssService.getLatestItems(oneDayAgo);
+
+        cachedResult = allItems.filter(
+          (item) =>
+            item.parsedDomain &&
+            item.parsedDomain.toLowerCase().includes(name.toLowerCase()),
+        );
+
+        const result = cachedResult.map((item) => ({
+          title: item.title,
+          link: item.link,
+          pubDate: item.pubDate,
+          url: item.url,
+          content: item.content,
+          guid: item.guid,
+          isoDate: item.isoDate,
+          media: item.media,
+        }));
+
+        await this.cacheManager.set(cacheKey, result, 300000);
+
+        return res.status(200).json(result);
       }
 
       return res.status(200).json(cachedResult);
@@ -79,14 +120,15 @@ export class RSSController {
     const feedItems = feed.items.map((item) => ({
       title: item.title,
       link: item.link,
-      pubDate: item.pubDate,
+      pubDate: new Date(item.pubDate),
       content: item.content,
       guid: item.guid,
       isoDate: item.isoDate,
       url: item.url,
       media: item['media:content']
-        ? item['media:content'][0].$
+        ? item['media:content'][0].$.url
         : 'Medya yok',
+      parsedDomain: this.parseDomain(item.link),
     }));
 
     const cacheKey = `feed:${name}`;
@@ -107,9 +149,9 @@ export class RSSController {
           item.isoDate,
           item.url,
           item.media,
+          item.parsedDomain,
         );
       }
-      console.log(`RSS feed '${name}' başarıyla veritabanına kaydedildi.`);
     } catch (error) {
       console.error(
         `RSS feed '${name}' veritabanına kaydedilirken hata oluştu:`,

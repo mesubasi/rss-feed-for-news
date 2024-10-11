@@ -5,12 +5,13 @@ import {
   Inject,
   Res,
 } from '@nestjs/common';
-import { bodyurl, feedtable, message } from '../drizzle/schema';
+import { bodyurl, feedtable} from '../drizzle/schema';
 import { Pool } from 'pg';
 import { drizzle } from 'drizzle-orm/node-postgres';
 import { sql } from 'drizzle-orm';
 import { CACHE_MANAGER } from '@nestjs/cache-manager';
 import { Cache } from 'cache-manager';
+import { RSSItem } from 'src/controllers/rss.controller';
 
 @Injectable()
 export class RssService {
@@ -23,6 +24,21 @@ export class RssService {
     this.db = drizzle(pool);
   }
 
+
+  private parseDomain(url: string): string {
+    try {
+      const parsedUrl = new URL(url);
+      const parseUrl = parsedUrl.hostname.split('.');
+      if (parseUrl.length >= 2) {
+        return parseUrl[0] === 'www' ? parseUrl[1] : parseUrl[0];
+      }
+      return parseUrl[0]; 
+    } catch (error) {
+      console.error('URL Parse işleminde hata oluştu:', error);
+      return '';
+    }
+  }
+
   async addRSS(name: string, url: string) {
     const cacheKey = `rss:${url}`;
     try {
@@ -33,10 +49,6 @@ export class RssService {
 
       if (existingItem.length > 0) {
         await this.cacheManager.set(cacheKey, existingItem[0], 3600000);
-        return {
-          message: 'Bu kaynak zaten mevcut',
-          status: HttpStatus.BAD_REQUEST,
-        };
       }
       await this.db
         .insert(bodyurl)
@@ -82,7 +94,7 @@ export class RssService {
       await this.cacheManager.set(cacheKey, result, 3600000);
       return result;
     } catch (error) {
-      console.error('Error searching RSS:', error);
+      console.error('RSS aramasında problem var:', error);
       throw new HttpException(
         'INTERNAL SERVER ERROR',
         HttpStatus.INTERNAL_SERVER_ERROR,
@@ -93,12 +105,13 @@ export class RssService {
   async addJSON(
     title: string,
     link: string,
-    pubDate: string,
+    pubDate: Date = new Date(),
     content: string,
     guid: string,
     isoDate: string,
     url: string,
     media: string,
+    parsedDomain: string,
     created_at: Date = new Date(),
   ) {
     const cacheKey = `feed:${guid}`;
@@ -113,9 +126,7 @@ export class RssService {
       const existingItem = await this.db
         .select()
         .from(feedtable)
-        .where(
-          sql`${feedtable.title} = ${title} AND ${feedtable.pubDate} = ${pubDate}`,
-        );
+        .where(sql`${feedtable.link} = ${link}`);
 
       if (existingItem.length > 0) {
         await this.cacheManager.set(cacheKey, existingItem[0], 3600000);
@@ -131,15 +142,36 @@ export class RssService {
         guid,
         isoDate,
         media,
+        parsedDomain,
         createdAt: created_at,
       };
+      
 
       await this.db.insert(feedtable).values(newItems).execute();
       await this.cacheManager.set(cacheKey, newItems, 3600000);
     } catch (error) {
-      console.error('Error adding JSON:', error);
+      console.error('JSON Eklemede Sorun Var!:', error);
       throw new HttpException(
         'Internal Server Error',
+        HttpStatus.INTERNAL_SERVER_ERROR,
+      );
+    }
+  }
+
+
+  async getLatestItems(fromDate: Date): Promise<RSSItem[]> {
+    try {
+      const result = await this.db
+        .select()
+        .from(feedtable)
+        .where(sql`${feedtable.pubDate} >= ${fromDate}`)
+        .orderBy(sql`${feedtable.pubDate} DESC`);
+
+      return result;
+    } catch (error) {
+      console.error('Son itemi çekmede sıkıntı var:', error);
+      throw new HttpException(
+        'Son RSS öğeleri alınırken bir hata oluştu',
         HttpStatus.INTERNAL_SERVER_ERROR,
       );
     }
