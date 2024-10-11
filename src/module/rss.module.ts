@@ -1,13 +1,12 @@
+import { CacheModule } from '@nestjs/cache-manager';
 import { Module } from '@nestjs/common';
-import { AppService } from 'src/app.service';
 import { FeedToDatabase, RSSController } from 'src/controllers/rss.controller';
-import { RssService } from 'src/service/rss.service';
-
+import { RssService } from 'src/services/rss.service';
 
 @Module({
-    imports: [],
-    controllers: [RSSController, FeedToDatabase],
-    providers: [RssService, AppService]
+  imports: [CacheModule.register()],
+  controllers: [RSSController, FeedToDatabase],
+  providers: [RssService],
+  exports: [RssService], 
 })
-
-export class RSS {}
+export class RSSModule {}

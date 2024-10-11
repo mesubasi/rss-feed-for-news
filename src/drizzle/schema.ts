@@ -30,6 +30,7 @@ export const feedtable = pgTable('feedtable', {
   content: varchar('content'),
   guid: varchar('guid'),
   isoDate: varchar('isodate'),
+  media: varchar("media"),
   createdAt: timestamp('created_at', {
     withTimezone: true,
     mode: "string"
