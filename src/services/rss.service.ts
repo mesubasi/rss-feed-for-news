@@ -169,7 +169,7 @@ export class RssService {
 
       return result;
     } catch (error) {
-      console.error('Son itemi çekmede sıkıntı var:', error);
+      console.error('Son itemi çekmede problem var:', error);
       throw new HttpException(
         'Son RSS öğeleri alınırken bir hata oluştu',
         HttpStatus.INTERNAL_SERVER_ERROR,
